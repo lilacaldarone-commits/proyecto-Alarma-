@@ -3,8 +3,224 @@
 <head>
     <title>Alarma</title>
 </head>
-<body>
+
+<style>
+
+/* ===== FONDO ARCANE (ZAUN ATMOSPHERE) ===== */
+body {
+    margin: 0;
+    height: 100vh;
+
+    background:
+        radial-gradient(circle at 20% 30%, #1a0033 0%, transparent 40%),
+        radial-gradient(circle at 80% 70%, #002b36 0%, transparent 45%),
+        linear-gradient(180deg, #05010a, #0b0016 60%, #020003);
+
+    color: white;
+    font-family: "Courier New", monospace;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* efecto humo Zaun */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            120deg,
+            rgba(255,0,255,0.04),
+            rgba(0,255,255,0.03) 2px,
+            transparent 3px,
+            transparent 6px
+        );
+    mix-blend-mode: screen;
+    pointer-events: none;
+}
+
+
+/* ===== INPUT HEXTECH ===== */
+input {
+    background: #02030a;
+    border: 2px solid #00eaff;
+    color: #00eaff;
+    padding: 6px 10px;
+    font-size: 16px;
+
+    box-shadow:
+        0 0 8px #00eaff,
+        inset 0 0 6px #002a33;
+}
+
+
+/* ===== BOTON HEXTECH ===== */
+button {
+    background: linear-gradient(45deg,#001a22,#003c47);
+    border: 2px solid #00eaff;
+    color: #00eaff;
+    padding: 6px 14px;
+    margin-left: 10px;
+    cursor: pointer;
+
+    text-transform: uppercase;
+    letter-spacing: 2px;
+
+    box-shadow:
+        0 0 12px #00eaff;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #00eaff;
+    color: black;
+    box-shadow:
+        0 0 25px #00eaff,
+        0 0 40px #00eaff;
+}
+/* ===== NUMEROS JINX (NEON + GRAFFITI SCRATCH) ===== */
+#textoAlarma {
+    position: relative;
+    font-size: 110px;
+    margin-top: 80px;
+
+    color: #ff00c8;
+    letter-spacing: 8px;
+
+    font-weight: bold;
+
+    text-shadow:
+        0 0 8px #ff00c8,
+        0 0 20px #ff00c8;
+
+    animation: glitchMove 2s infinite;
+}
+/* CAPA CYAN */
+#textoAlarma::before,
+#textoAlarma::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+}
+/* cyan shift */
+#textoAlarma::before {
+    color: #00f7ff;
+    transform: translate(2px,0);
+    opacity: 0.8;
+    animation: glitchSlice1 2s infinite linear alternate-reverse;
+}
+/* magenta shift */
+#textoAlarma::after {
+    color: #ff00c8;
+    transform: translate(-2px,0);
+    opacity: 0.7;
+    animation: glitchSlice2 1.7s infinite linear alternate-reverse;
+}
+.hextech-energy {
+    height: 100%;
+    width: 0%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #00eaff,
+            #7df9ff,
+            #00eaff
+        );
+
+    box-shadow:
+        0 0 15px #00eaff,
+        0 0 30px #00eaff;
+
+    animation: energiaHextech 2s linear infinite;
+}
+
+@keyframes energiaHextech {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+
+/* ===== PARPADEO JINX CUANDO SUENA ===== */
+.alarm-active {
+    animation: jinxFlash 0.3s infinite alternate;
+}
+
+@keyframes jinxFlash {
+    from {
+        text-shadow:
+            0 0 10px #ff2bd6,
+            0 0 30px #ff2bd6;
+    }
+    to {
+        text-shadow:
+            0 0 20px #00eaff,
+            0 0 40px #00eaff;
+    }
+}
+
+</style>
+
+</style>
+
+<body onload="comenzarReloj()">
     <input type="number" id="tiempoElegido">
-    <button onclick="comenzarTiempo()">Alarma</button>
+<button onclick="comenzarTiempo()">Alarma</button>
+<h1 id="textoAlarma">00:00:00</h1>
+    <audio id="audioAlarma">
+        <source src="alarma.mp3" type="audio/mpeg">
+        sonido no habilitado
+    </audio>
+
+    <script>
+
+        let elementoSegundos = document.getElementById("tiempoElegido");
+        let elementoTextoAlarma = document.getElementById("textoAlarma");
+        let elementoAudioAlarma = document.getElementById("audioAlarma");
+
+        function comenzarTiempo() {
+            setTimeout(tiempoCumplido, 1000 * elementoSegundos.value);
+        }
+
+        function tiempoCumplido() {
+            elementoTextoAlarma.dataset.text = elementoTextoAlarma.textContent;
+            elementoAudioAlarma.play();
+        }
+        function comenzarReloj(){
+            setInterval(tictac,1000);
+        }
+        function tictac(){
+            let TiempoActual = new Date();
+            let hora = String(TiempoActual.getHours()).padStart(2,'0');
+            let minutos = String(TiempoActual.getMinutes()).padStart(2,'0');
+            let segundos = String(TiempoActual.getSeconds()).padStart(2,'0');
+
+            let textoHora =hora + ":" + minutos + ":" + segundos;
+            elementoTextoAlarma.textContent = textoHora;
+
+
+            function actualizarReloj() {
+
+    let ahora = new Date();
+    let tiempo =
+        ahora.getHours().toString().padStart(2,"0") + ":" +
+        ahora.getMinutes().toString().padStart(2,"0") + ":" +
+        ahora.getSeconds().toString().padStart(2,"0");
+
+
+        
+
+}
+
+            
+        }
+    </script>
+
+
 </body>
 </html>
